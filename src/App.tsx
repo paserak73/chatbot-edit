@@ -1,5 +1,5 @@
 import React from "react";
-import { SheetJSFT, exmapleData, transformData } from "./utils";
+import { SheetJSFT, exmapleData, transformData, createLevels } from "./utils";
 import { createEditor } from "./Rete/rete";
 import * as XLSX from "xlsx";
 import Button from "@material-ui/core/Button";
@@ -13,9 +13,17 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import TextField from "@material-ui/core/TextField";
 import ConnectElements from "react-connect-elements";
+import { Tree, TreeNode } from "react-organizational-chart";
+import styled from "styled-components";
 
-// ideally use styled-components.com
 import "./App.css";
+
+const StyledNode = styled.div`
+  padding: 5px;
+  border-radius: 8px;
+  display: inline-block;
+  border: 1px solid red;
+`;
 
 type NumString = number | string;
 
@@ -42,6 +50,7 @@ type State = {
   openDeleteModal: boolean;
   openEditModal: boolean;
   data: Data;
+  levelStructure: null | any;
 };
 
 type Props = {};
@@ -52,6 +61,7 @@ class App extends React.Component<Props, State> {
     openDeleteModal: false,
     openEditModal: false,
     data: null,
+    levelStructure: null,
   };
 
   readFile = async (e: any) => {
@@ -67,46 +77,23 @@ class App extends React.Component<Props, State> {
         const ws = wb.Sheets[wsname];
         const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
         const newData = transformData(data);
-        this.setState({ data: newData, excelLoaded: true });
+        const levelStructure = createLevels(newData);
+        this.setState({
+          data: newData,
+          levelStructure,
+          excelLoaded: true,
+        });
       };
       if (rABS) reader.readAsBinaryString(file);
       else reader.readAsArrayBuffer(file);
     }
   };
 
-  renderOptions = (option: Row) => {
-    return (
-      <div className={`questionWrap elementChild`} key={option[1].questionId}>
-        <div className="questionHeader">
-          <span className="questionHeaderTitle">{option[0]}</span>
-          <div className="headerIcons">
-            <IconButton
-              aria-label="edit"
-              size="small"
-              onClick={this.toggleEditModal}
-            >
-              <EditIcon fontSize="small" />
-            </IconButton>
-            <IconButton
-              aria-label="delete"
-              size="small"
-              onClick={this.toggleDeleteModal}
-            >
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-          </div>
-        </div>
-        <div className="questionBody">
-          <div className="questionMess">{option[1].questionText}</div>
-          {/* TODO SELECT */}
-        </div>
-      </div>
-    );
-  };
-
   /* TODO Should be a component MesageItem */
   renderAnswer = (id: string, question: Row) => {
-    if (id.includes("-")) return null;
+    if (id === "END" || question.questionId === undefined) return null;
+    const { data } = this.state;
+    //if (id.includes("-")) return null;
     //const { data } = this.state;
     // const children = Object.keys(data).filter((item) => {
     //   if (item && item.includes(question.routeTo)) {
@@ -114,10 +101,79 @@ class App extends React.Component<Props, State> {
     //   }
     //   return false;
     // });
+    const children = Object.keys(data).filter((rowId) =>
+      data[rowId].questionId.toString().includes(question.routeTo)
+    );
+
+    console.log("children", children);
+    return (
+      <TreeNode key={id} label={this.renderLabel(id, question)}>
+        {children.length > 0 && (
+          <>
+            {children[0] && (
+              <TreeNode
+                label={this.renderLabel(children[0], data[children[0]])}
+              >
+                {this.renderAnswer(
+                  data[children[0]].routeTo,
+                  data[data[children[0]].routeTo]
+                )}
+              </TreeNode>
+            )}
+            {children[1] && (
+              <TreeNode
+                label={this.renderLabel(children[1], data[children[1]])}
+              >
+                {this.renderAnswer(
+                  data[children[1]].routeTo,
+                  data[data[children[1]].routeTo]
+                )}
+              </TreeNode>
+            )}
+            {children[2] && (
+              <TreeNode
+                label={this.renderLabel(children[2], data[children[2]])}
+              >
+                {this.renderAnswer(
+                  data[children[2]].routeTo,
+                  data[data[children[2]].routeTo]
+                )}
+              </TreeNode>
+            )}
+            {children[3] && (
+              <TreeNode
+                label={this.renderLabel(children[3], data[children[3]])}
+              >
+                {this.renderAnswer(
+                  data[children[3]].routeTo,
+                  data[data[children[3]].routeTo]
+                )}
+              </TreeNode>
+            )}
+            {children[4] && (
+              <TreeNode
+                label={this.renderLabel(children[4], data[children[4]])}
+              >
+                {this.renderAnswer(
+                  data[children[4]].routeTo,
+                  data[data[children[4]].routeTo]
+                )}
+              </TreeNode>
+            )}
+          </>
+        )}
+
+        {/* {id !== "950294" &&
+          this.renderAnswer(data[].routeTo, data[question.routeTo])} */}
+      </TreeNode>
+    );
+  };
+
+  renderLabel = (id: string, question: Row) => {
     const answers = question.answers && question.answers.split("|");
     return (
-      <>
-        <div className={`questionWrap element`} key={question.questionId}>
+      <div className="questionContainer">
+        <div className="questionWrap">
           <div className="questionHeader">
             <span className="questionHeaderTitle">[{question.questionId}]</span>
             <div className="headerIcons">
@@ -140,20 +196,13 @@ class App extends React.Component<Props, State> {
 
           <div className="questionBody">
             <div className="questionMess">{question.questionText}</div>
-            {answers &&
-              answers.map((a) => (
-                <div className="questionOption" key={id}>
-                  {a}
-                </div>
+            {question.answerRouting &&
+              answers.map((answer) => (
+                <div className="questionOption"> {answer}</div>
               ))}
           </div>
         </div>
-        {/* {question.type === "SELECT" && (
-          <div className="optionsWrap">
-            {question.options.map((option) => this.renderOptions(option))}
-          </div>
-        )} */}
-      </>
+      </div>
     );
   };
 
@@ -172,7 +221,13 @@ class App extends React.Component<Props, State> {
   // exporting
 
   render() {
-    const { excelLoaded, data, openDeleteModal, openEditModal } = this.state;
+    const {
+      excelLoaded,
+      data,
+      openDeleteModal,
+      openEditModal,
+      levelStructure,
+    } = this.state;
     console.log("data", data);
 
     // return (
@@ -198,14 +253,43 @@ class App extends React.Component<Props, State> {
       );
     }
 
+    const firstId = "950201";
+
     return (
       <div className="App">
-        {Object.keys(data).map((id) => this.renderAnswer(id, data[id]))}
+        {/*Object.keys(data).map((id) => this.renderAnswer(id, data[id])) */}
         {/* <ConnectElements
           selector=".questionWrap"
           elements={[{ from: ".element", to: ".elementChild" }]}
           color="green"
         /> */}
+
+        <Tree
+          nodePadding={"15px"}
+          lineHeight={"45px"}
+          lineWidth={"2px"}
+          lineColor={"#00BFA4"}
+          lineBorderRadius={"10px"}
+          label={this.renderAnswer(firstId, data[firstId])}
+        >
+          {Object.keys(levelStructure[firstId]).map((childId) =>
+            this.renderAnswer(childId, data[childId])
+          )}
+          {/* <TreeNode label={<StyledNode>Child 1</StyledNode>}>
+            <TreeNode label={<StyledNode>Grand Child</StyledNode>} />
+          </TreeNode>
+          <TreeNode label={<StyledNode>Child 2</StyledNode>}>
+            <TreeNode label={<StyledNode>Grand Child</StyledNode>}>
+              <TreeNode label={<StyledNode>Great Grand Child 1</StyledNode>} />
+              <TreeNode label={<StyledNode>Great Grand Child 2</StyledNode>} />
+            </TreeNode>
+          </TreeNode>
+          <TreeNode label={<StyledNode>Child 3</StyledNode>}>
+            <TreeNode label={<StyledNode>Grand Child 1</StyledNode>} />
+            <TreeNode label={<StyledNode>Grand Child 2</StyledNode>} />
+          </TreeNode>
+         */}
+        </Tree>
 
         <Dialog
           open={openDeleteModal}

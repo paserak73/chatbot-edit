@@ -1,6 +1,7 @@
 .App {
   background: #6753fb;
-  width: 100vw;
+  width: 100%;
+  min-width: 100vw;
   min-height: 100vh;
   height: 100%;
   padding-top: 30px;
@@ -10,8 +11,6 @@
 .questionWrap {
   background: white;
   width: 350px;
-  margin: 20px;
-  margin-bottom: 80px;
   border-radius: 4px;
 }
 
@@ -59,4 +58,11 @@
   z-index: 20;
   margin-left: 400px;
   margin-top: -370px;
+}
+
+.questionContainer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

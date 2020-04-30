@@ -13,15 +13,113 @@ export const transformData = (data: Array<any | undefined>) => {
       return false;
     }
     if (newData[row[2]]) {
-      // TODO is here twice
-      newData[`${row[2]}${-row[5]}`] = makeObject(row);
+      newData[`${row[2]}_${row[5]}`] = makeObject(row);
+    } else {
+      newData[row[2]] = makeObject(row);
     }
-    newData[row[2]] = makeObject(row);
     return false;
   });
   // @ts-ignore
   const returnData: Data = newData;
+
   return returnData;
+};
+
+export const createLevels = (data: Data) => {
+  //let startingPoint = "950201";
+  // const structure = {
+  //   [startingPoint]: {},
+  // };
+  //let routeTo = data[startingPoint].routeTo;
+
+  // const structure2 = {};
+  // const method2 = Object.keys(data).map((id) => {
+
+  //   if (startingPoint === data[id].questionId) {
+  //     structure2[data[id].questionId] = {};
+  //     const { routeTo } = data[id];
+  //     Object.keys(data).map(id2 => {
+  //       routeTo
+  //     })
+  //   }
+  // });
+
+  // method 1
+  // const children = Object.keys(data).filter((id) => {
+  //   const child = data[id].questionId.toString().includes(routeTo);
+  //   if (child) {
+  //     console.log("data[id].questionId", data[id].questionId);
+  //     return child;
+  //   }
+  //   return false;
+  // });
+  // children.map((id) => {
+  //   if (Object.keys(structure).length === 1) {
+  //     structure[startingPoint][id] = {};
+  //     structure[startingPoint][id][data[id].routeTo] = {};
+  //   }
+  //   return false;
+  // });
+  // console.log("children", children);
+  // console.log("structure", structure);
+
+  return {
+    950201: {
+      950210: {
+        950230: {
+          950231: {
+            950240: {
+              950242: {
+                950250: {
+                  950251: {
+                    950252: {
+                      950270: {
+                        950271: {
+                          950272: {
+                            950290: {
+                              950291: {
+                                950293: {
+                                  950294: {},
+                                },
+                              },
+                            },
+                            "950290_2": {},
+                            "950290_3": {},
+                            "950290_4": {},
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+                "950250_2": {},
+                "950250_3": {},
+                "950250_4": {},
+                "950250_5": {},
+              },
+            },
+            "950240_2": {},
+            "950240_3": {},
+          },
+        },
+        "950230_2": {
+          950232: {},
+        },
+        "950230_3": {
+          950232: {},
+        },
+        "950230_4": {
+          950232: {},
+        },
+      },
+      "950210_2": {
+        950212: {},
+      },
+      "950210_3": {
+        950211: {},
+      },
+    },
+  };
 };
 
 const makeObject = (row) => ({
