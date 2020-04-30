@@ -109,58 +109,11 @@ class App extends React.Component<Props, State> {
     return (
       <TreeNode key={id} label={this.renderLabel(id, question)}>
         {children.length > 0 && (
-          <>
-            {children[0] && (
-              <TreeNode
-                label={this.renderLabel(children[0], data[children[0]])}
-              >
-                {this.renderAnswer(
-                  data[children[0]].routeTo,
-                  data[data[children[0]].routeTo]
-                )}
-              </TreeNode>
+          <TreeNode label={this.renderLabel(children[0], data[children[0]])}>
+            {children.map((id) =>
+              this.renderAnswer(data[id].routeTo, data[data[id].routeTo])
             )}
-            {children[1] && (
-              <TreeNode
-                label={this.renderLabel(children[1], data[children[1]])}
-              >
-                {this.renderAnswer(
-                  data[children[1]].routeTo,
-                  data[data[children[1]].routeTo]
-                )}
-              </TreeNode>
-            )}
-            {children[2] && (
-              <TreeNode
-                label={this.renderLabel(children[2], data[children[2]])}
-              >
-                {this.renderAnswer(
-                  data[children[2]].routeTo,
-                  data[data[children[2]].routeTo]
-                )}
-              </TreeNode>
-            )}
-            {children[3] && (
-              <TreeNode
-                label={this.renderLabel(children[3], data[children[3]])}
-              >
-                {this.renderAnswer(
-                  data[children[3]].routeTo,
-                  data[data[children[3]].routeTo]
-                )}
-              </TreeNode>
-            )}
-            {children[4] && (
-              <TreeNode
-                label={this.renderLabel(children[4], data[children[4]])}
-              >
-                {this.renderAnswer(
-                  data[children[4]].routeTo,
-                  data[data[children[4]].routeTo]
-                )}
-              </TreeNode>
-            )}
-          </>
+          </TreeNode>
         )}
 
         {/* {id !== "950294" &&
@@ -196,10 +149,11 @@ class App extends React.Component<Props, State> {
 
           <div className="questionBody">
             <div className="questionMess">{question.questionText}</div>
-            {question.answerRouting &&
-              answers.map((answer) => (
-                <div className="questionOption"> {answer}</div>
-              ))}
+            {question.answerRouting && (
+              <div className="questionOption">
+                {answers[Number(question.answerRouting) - 1]}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -254,6 +208,7 @@ class App extends React.Component<Props, State> {
     }
 
     const firstId = "950201";
+    const firstIdChildren = ["950210", "950210_2", "950210_3"];
 
     return (
       <div className="App">
@@ -270,11 +225,11 @@ class App extends React.Component<Props, State> {
           lineWidth={"2px"}
           lineColor={"#00BFA4"}
           lineBorderRadius={"10px"}
-          label={this.renderAnswer(firstId, data[firstId])}
+          label={this.renderLabel(firstId, data[firstId])}
         >
-          {Object.keys(levelStructure[firstId]).map((childId) =>
-            this.renderAnswer(childId, data[childId])
-          )}
+          {firstIdChildren.map((childId) => {
+            return this.renderAnswer(childId, data[childId]);
+          })}
           {/* <TreeNode label={<StyledNode>Child 1</StyledNode>}>
             <TreeNode label={<StyledNode>Grand Child</StyledNode>} />
           </TreeNode>

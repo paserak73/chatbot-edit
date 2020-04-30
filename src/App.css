@@ -1,9 +1,9 @@
 .App {
   background: #6753fb;
-  width: 100%;
+
   min-width: 100vw;
   min-height: 100vh;
-  height: 100%;
+
   padding-top: 30px;
   padding-bottom: 300px;
 }
@@ -37,6 +37,7 @@
 .questionBody {
   padding: 15px;
   position: relative;
+  background: #e8e8e8;
 }
 
 .questionMess {
